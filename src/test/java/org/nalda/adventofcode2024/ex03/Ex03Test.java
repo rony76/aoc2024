@@ -15,4 +15,13 @@ public class Ex03Test {
 
         assertThat(actual).isEqualTo(BigInteger.valueOf(161));
     }
+
+    @Test
+    void testSampleInputWithEnablement() {
+        final Ex03 ex03 = new Ex03();
+
+        final BigInteger actual = ex03.sumMultiplicationsWithEnablement("ex03.input.txt");
+
+        assertThat(actual).isEqualTo(BigInteger.valueOf(48));
+    }
 }
