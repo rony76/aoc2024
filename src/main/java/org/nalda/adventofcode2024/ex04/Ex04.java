@@ -14,9 +14,12 @@ public class Ex04 {
         Ex04 ex04 = new Ex04("ex04.input.txt");
         long xmases = ex04.countXmas();
         System.out.println(xmases);
+        xmases = ex04.countMasCross();
+        System.out.println(xmases);
     }
 
     private final class Position {
+
         private final int row;
         private final int col;
 
@@ -62,7 +65,6 @@ public class Ex04 {
 
 
     }
-
     private enum Direction {
         N (-1, 0),
         NE (-1, 1),
@@ -74,18 +76,45 @@ public class Ex04 {
         NW(-1, -1);
 
         private final int deltaRow;
+
         private final int deltaCol;
 
         Direction(int deltaRow, int deltaCol) {
             this.deltaRow = deltaRow;
             this.deltaCol = deltaCol;
         }
+
+        public Direction opposite() {
+            return switch (this) {
+                case N -> S;
+                case NE -> SW;
+                case E -> W;
+                case SE -> NW;
+                case S -> N;
+                case SW -> NE;
+                case W -> E;
+                case NW -> SE;
+            };
+        }
+
+        public Direction orthogonalLeft() {
+            return switch (this) {
+                case N -> E;
+                case NE -> SE;
+                case E -> S;
+                case SE -> SW;
+                case S -> W;
+                case SW -> NW;
+                case W -> N;
+                case NW -> NE;
+            };
+        }
     }
 
     private final char[][] data;
+
     private final int height;
     private final int width;
-
     public Ex04(String inputName) {
         final List<String> lines = getLineList(inputName);
 
@@ -113,6 +142,20 @@ public class Ex04 {
         return result;
     }
 
+    public long countMasCross() {
+        long result = 0;
+
+        for (int row = 0; row < height; row++) {
+            for (int col = 0; col < width; col++) {
+                if (data[row][col] == 'A') {
+                    result += countMasAround(row, col);
+                }
+            }
+        }
+
+        return result;
+    }
+
     private long countXmasFrom(int row, int col) {
         final Position position = new Position(row, col);
 
@@ -128,5 +171,35 @@ public class Ex04 {
             }
         }
         return true;
+    }
+
+    private long countMasAround(int row, int col) {
+        final Position position = new Position(row, col);
+
+        long result = 0;
+        if (findMasCross(position, Direction.NE)) {
+            result++;
+        }
+
+        return result;
+    }
+
+    private boolean findMasCross(Position position, Direction dir) {
+        return findMas(position, dir) && findMas(position, dir.orthogonalLeft());
+    }
+
+    private boolean findMas(Position position, Direction dir) {
+        final Position p1 = position.move(dir);
+        if (p1 == null) {
+            return false;
+        }
+        final Position p2 = position.move(dir.opposite());
+        if (p2 == null) {
+            return false;
+        }
+        final char c1 = p1.getChar();
+        final char c2 = p2.getChar();
+
+        return (c1 == 'M' && c2 == 'S') || (c1 == 'S' && c2 == 'M');
     }
 }

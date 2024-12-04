@@ -12,4 +12,12 @@ public class Ex04Test {
 
         assertThat(xmases).isEqualTo(18);
     }
+
+    @Test
+    void findXmasInExample() {
+        Ex04 ex04 = new Ex04("ex04.input.txt");
+        long xmases = ex04.countMasCross();
+
+        assertThat(xmases).isEqualTo(9);
+    }
 }
