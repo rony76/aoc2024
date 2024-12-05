@@ -12,4 +12,12 @@ public class Ex05Test {
 
         assertThat(updates).isEqualTo(143);
     }
+
+    @Test
+    void countFixedUpdates() {
+        Ex05 ex05 = new Ex05("ex05.input.txt");
+        long updates = ex05.countFixedUpdates();
+
+        assertThat(updates).isEqualTo(123);
+    }
 }
