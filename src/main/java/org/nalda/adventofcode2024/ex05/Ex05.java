@@ -10,8 +10,8 @@ public class Ex05 {
     private final List<Update> updates;
 
     private class Update {
-        private final int[] values;
 
+        private final int[] values;
         private Update(int[] values) {
             this.values = values;
         }
@@ -36,8 +36,27 @@ public class Ex05 {
 
             return true;
         }
-    }
 
+        public Update fix() {
+            final int[] fixedValues = Arrays.stream(values)
+                    .boxed()
+                    .sorted((a, b) -> {
+                        if (a.equals(b)) {
+                            return 0;
+                        }
+                        if (rules.getOrDefault(a, Collections.emptySet()).contains(b)) {
+                            return -1;
+                        }
+                        if (rules.getOrDefault(b, Collections.emptySet()).contains(a)) {
+                            return 1;
+                        }
+                        throw new RuntimeException("Do not how to compare " + a + " and " + b);
+                    })
+                    .mapToInt(Integer::intValue)
+                    .toArray();
+            return new Update(fixedValues);
+        }
+    }
     public Ex05(String inputName) {
         final List<String> lines = getLineList(inputName);
         final int separator = lines.indexOf("");
@@ -53,6 +72,8 @@ public class Ex05 {
         final Ex05 ex05 = new Ex05("ex05.input.txt");
         final long correctUpdates = ex05.countCorrectUpdates();
         System.out.println(correctUpdates);
+        final long fixedUpdates = ex05.countFixedUpdates();
+        System.out.println(fixedUpdates);
     }
 
     private void parseUpdate(String updateLine) {
@@ -73,6 +94,14 @@ public class Ex05 {
     public long countCorrectUpdates() {
         return updates.stream()
                 .filter(Update::isCorrect)
+                .mapToLong(Update::middlePage)
+                .sum();
+    }
+
+    public long countFixedUpdates() {
+        return updates.stream()
+                .filter(update -> !update.isCorrect())
+                .map(Update::fix)
                 .mapToLong(Update::middlePage)
                 .sum();
     }
