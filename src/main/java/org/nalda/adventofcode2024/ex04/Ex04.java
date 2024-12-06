@@ -1,14 +1,15 @@
 package org.nalda.adventofcode2024.ex04;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import org.nalda.adventofcode2024.common.BidimensionalMap;
+import org.nalda.adventofcode2024.common.BidimensionalMap.Direction;
+import org.nalda.adventofcode2024.common.BidimensionalMap.Position;
 
-import static org.nalda.adventofcode2024Ø.ResourceUtil.getLineList;
+import java.util.Arrays;
 
 public class Ex04 {
 
     private static final char[] XMAS_CHARS = "XMAS".toCharArray();
+    private final BidimensionalMap map;
 
     public static void main(String[] args) {
         Ex04 ex04 = new Ex04("ex04.input.txt");
@@ -18,122 +19,16 @@ public class Ex04 {
         System.out.println(xmases);
     }
 
-    private final class Position {
-
-        private final int row;
-        private final int col;
-
-        private Position(int row, int col) {
-            this.row = row;
-            this.col = col;
-        }
-
-        public Position move(Direction direction) {
-            final int row = this.row + direction.deltaRow;
-            if (row < 0 || row >= height) {
-                return null;
-            }
-            final int col = this.col + direction.deltaCol;
-            if (col < 0 || col >= width) {
-                return null;
-            }
-            return new Position(row, col);
-        }
-
-        public char getChar() {
-            return data[row][col];
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj == this) return true;
-            if (obj == null || obj.getClass() != this.getClass()) return false;
-            var that = (Position) obj;
-            return this.row == that.row &&
-                    this.col == that.col;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(row, col);
-        }
-
-        @Override
-        public String toString() {
-            return "<" + row + ", " + col + '>';
-        }
-
-
-    }
-    private enum Direction {
-        N (-1, 0),
-        NE (-1, 1),
-        E (0, 1),
-        SE (1, 1),
-        S (1, 0),
-        SW (1, -1),
-        W (0, -1),
-        NW(-1, -1);
-
-        private final int deltaRow;
-
-        private final int deltaCol;
-
-        Direction(int deltaRow, int deltaCol) {
-            this.deltaRow = deltaRow;
-            this.deltaCol = deltaCol;
-        }
-
-        public Direction opposite() {
-            return switch (this) {
-                case N -> S;
-                case NE -> SW;
-                case E -> W;
-                case SE -> NW;
-                case S -> N;
-                case SW -> NE;
-                case W -> E;
-                case NW -> SE;
-            };
-        }
-
-        public Direction orthogonalLeft() {
-            return switch (this) {
-                case N -> E;
-                case NE -> SE;
-                case E -> S;
-                case SE -> SW;
-                case S -> W;
-                case SW -> NW;
-                case W -> N;
-                case NW -> NE;
-            };
-        }
-    }
-
-    private final char[][] data;
-
-    private final int height;
-    private final int width;
     public Ex04(String inputName) {
-        final List<String> lines = getLineList(inputName);
-
-        height = lines.size();
-        width = lines.get(0).length();
-        data = new char[height][];
-
-        for (int i = 0; i < lines.size(); i++) {
-            data[i] = new char[width];
-            lines.get(i).getChars(0, width, data[i], 0);
-        }
+        map = new BidimensionalMap(inputName);
     }
 
     public long countXmas() {
         long result = 0;
 
-        for (int row = 0; row < height; row++) {
-            for (int col = 0; col < width; col++) {
-                if (data[row][col] == 'X') {
+        for (int row = 0; row < map.height; row++) {
+            for (int col = 0; col < map.width; col++) {
+                if (map.charAt(row, col) == 'X') {
                     result += countXmasFrom(row, col);
                 }
             }
@@ -145,9 +40,9 @@ public class Ex04 {
     public long countMasCross() {
         long result = 0;
 
-        for (int row = 0; row < height; row++) {
-            for (int col = 0; col < width; col++) {
-                if (data[row][col] == 'A') {
+        for (int row = 0; row < map.height; row++) {
+            for (int col = 0; col < map.width; col++) {
+                if (map.charAt(row, col) == 'A') {
                     result += countMasAround(row, col);
                 }
             }
@@ -157,7 +52,7 @@ public class Ex04 {
     }
 
     private long countXmasFrom(int row, int col) {
-        final Position position = new Position(row, col);
+        final Position position = map.positionAt(row, col);
 
         return Arrays.stream(Direction.values())
                 .filter(dir -> findXmasFromPosMovingInDirection(position, dir))
@@ -174,7 +69,7 @@ public class Ex04 {
     }
 
     private long countMasAround(int row, int col) {
-        final Position position = new Position(row, col);
+        final Position position = map.positionAt(row, col);
 
         long result = 0;
         if (findMasCross(position, Direction.NE)) {
@@ -185,7 +80,7 @@ public class Ex04 {
     }
 
     private boolean findMasCross(Position position, Direction dir) {
-        return findMas(position, dir) && findMas(position, dir.orthogonalLeft());
+        return findMas(position, dir) && findMas(position, dir.turnRight90());
     }
 
     private boolean findMas(Position position, Direction dir) {
