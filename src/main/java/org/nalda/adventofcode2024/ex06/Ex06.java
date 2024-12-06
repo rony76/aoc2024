@@ -1,18 +1,19 @@
 package org.nalda.adventofcode2024.ex06;
 
+import org.nalda.adventofcode2024.common.BidimensionalMap;
+import org.nalda.adventofcode2024.common.BidimensionalMap.Direction;
+import org.nalda.adventofcode2024.common.BidimensionalMap.Position;
+
 import java.util.*;
 import java.util.concurrent.*;
-
-import static org.nalda.adventofcode2024Ø.ResourceUtil.getLineList;
+import java.util.function.Function;
 
 public class Ex06 {
 
     public static final char COVERED = 'X';
     public static final char GUARD_NORTH = '^';
     public static final char OBSTACLE = '#';
-    private final char[][] map;
-    private final int height;
-    private final int width;
+    private final BidimensionalMap map;
 
     public static void main(String[] args) {
         Ex06 ex06 = new Ex06("ex06.input.txt");
@@ -25,16 +26,7 @@ public class Ex06 {
     }
 
     public Ex06(String inputName) {
-        final List<String> lineList = getLineList(inputName);
-        height = lineList.size();
-        width = lineList.get(0).length();
-        map = new char[height][width];
-        for (int row = 0; row < lineList.size(); row++) {
-            final String line = lineList.get(row);
-            for (int col = 0; col < line.length(); col++) {
-                map[row][col] = line.charAt(col);
-            }
-        }
+        map = new BidimensionalMap(inputName);
     }
 
     public long countGuardPositions() {
@@ -44,29 +36,26 @@ public class Ex06 {
     }
 
     private long countCoveredPositions() {
-        long coveredPositions = 0;
-        for (int row = 0; row < height; row++) {
-            for (int col = 0; col < width; col++) {
-                if (map[row][col] == COVERED) {
-                    coveredPositions++;
-                }
+        return map.reduce((coveredPositions, position) -> {
+            if (position.getChar() == COVERED) {
+                return coveredPositions + 1;
             }
-        }
-        return coveredPositions;
+            return coveredPositions;
+        }, 0L);
     }
 
     private void coverMap(Position currentPosition) {
         Direction currentDirection = Direction.N;
 
-        currentPosition.setCovered();
+        currentPosition.setChar(COVERED);
         while (true) {
             Position nextPosition = currentPosition.move(currentDirection);
             if (nextPosition == null) {
                 return;
             }
 
-            while (nextPosition.isObstacle()) {
-                currentDirection = currentDirection.turnRight();
+            while (nextPosition.getChar() == OBSTACLE) {
+                currentDirection = currentDirection.turnRight90();
                 nextPosition = currentPosition.move(currentDirection);
                 if (nextPosition == null) {
                     return;
@@ -74,19 +63,17 @@ public class Ex06 {
             }
 
             currentPosition = nextPosition;
-            currentPosition.setCovered();
+            currentPosition.setChar(COVERED);
         }
     }
 
     private Position findGuard() {
-        for (int row = 0; row < height; row++) {
-            for (int col = 0; col < width; col++) {
-                if (map[row][col] == GUARD_NORTH) {
-                    return new Position(row, col);
-                }
-            }
-        }
+        final Function<Position, Position> guardFinder = position -> position.getChar() == GUARD_NORTH ? position : null;
+        Position guardPosition = map.findFirstPosition(guardFinder);
 
+        if (guardPosition != null) {
+            return guardPosition;
+        }
         throw new RuntimeException("Guard not found");
     }
 
@@ -126,21 +113,12 @@ public class Ex06 {
     }
 
     private List<Position> collectCandidateObstacles(Position guardStartPosition) {
-        List<Position> obstacles = new ArrayList<>();
-
-        for (int row = 0; row < height; row++) {
-            for (int col = 0; col < width; col++) {
-                if (map[row][col] == COVERED) {
-                    final Position candidatePos = new Position(row, col);
-                    if (candidatePos.equals(guardStartPosition)) {
-                        continue;
-                    }
-
-                    obstacles.add(candidatePos);
-                }
+        return map.reduce((obstacles, position) -> {
+            if ((position.getChar() == COVERED) && !position.equals(guardStartPosition)) {
+                obstacles.add(position);
             }
-        }
-        return obstacles;
+            return obstacles;
+        }, new ArrayList<>());
     }
 
     private record Turn(Position p, Direction d) {
@@ -158,8 +136,8 @@ public class Ex06 {
                 return false;
             }
 
-            while (nextPosition.isObstacle() || nextPosition.equals(obstacle)) {
-                currentDirection = currentDirection.turnRight();
+            while (nextPosition.getChar() == OBSTACLE || nextPosition.equals(obstacle)) {
+                currentDirection = currentDirection.turnRight90();
                 final Turn turn = new Turn(currentPosition, currentDirection);
                 if (turns.contains(turn)) {
                     return true;
@@ -175,81 +153,5 @@ public class Ex06 {
             currentPosition = nextPosition;
         }
     }
-
-    private final class Position {
-
-        private final int row;
-        private final int col;
-
-        private Position(int row, int col) {
-            this.row = row;
-            this.col = col;
-        }
-
-        public Position move(Direction direction) {
-            final int row = this.row + direction.deltaRow;
-            if (row < 0 || row >= height) {
-                return null;
-            }
-            final int col = this.col + direction.deltaCol;
-            if (col < 0 || col >= width) {
-                return null;
-            }
-            return new Position(row, col);
-        }
-
-        public void setCovered() {
-            map[row][col] = COVERED;
-        }
-
-        public boolean isObstacle() {
-            return map[row][col] == OBSTACLE;
-        }
-
-        @Override
-        public String toString() {
-            return "<" + row +
-                    "," + col +
-                    '>';
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof Position p)) return false;
-            return row == p.row && col == p.col;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(row, col);
-        }
-    }
-
-    private enum Direction {
-        N (-1, 0),
-        E (0, 1),
-        S (1, 0),
-        W (0, -1);
-
-        private final int deltaRow;
-
-        private final int deltaCol;
-
-        Direction(int deltaRow, int deltaCol) {
-            this.deltaRow = deltaRow;
-            this.deltaCol = deltaCol;
-        }
-
-        public Direction turnRight() {
-            return switch (this) {
-                case N -> E;
-                case E -> S;
-                case S -> W;
-                case W -> N;
-            };
-        }
-    }
-
 
 }

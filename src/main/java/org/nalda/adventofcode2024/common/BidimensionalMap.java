@@ -2,6 +2,8 @@ package org.nalda.adventofcode2024.common;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import static org.nalda.adventofcode2024Ø.ResourceUtil.getLineList;
 
@@ -32,12 +34,34 @@ public class BidimensionalMap {
         return new Position(row, col);
     }
 
+    public <T> T findFirstPosition(Function<Position, T> function) {
+        for (int row = 0; row < height; row++) {
+            for (int col = 0; col < width; col++) {
+                final T result = function.apply(positionAt(row, col));
+                if (result != null) {
+                    return result;
+                }
+            }
+        }
+        return null;
+    }
+
+    public <T> T reduce(BiFunction<T, Position, T> accumulator, T initial) {
+        T result = initial;
+        for (int row = 0; row < height; row++) {
+            for (int col = 0; col < width; col++) {
+                result = accumulator.apply(result, positionAt(row, col));
+            }
+        }
+        return result;
+    }
+
     public class Position {
 
-        private final int row;
-        private final int col;
+        protected final int row;
+        protected final int col;
 
-        private Position(int row, int col) {
+        protected Position(int row, int col) {
             this.row = row;
             this.col = col;
         }
@@ -51,11 +75,15 @@ public class BidimensionalMap {
             if (col < 0 || col >= width) {
                 return null;
             }
-            return new Position(row, col);
+            return positionAt(row, col);
         }
 
         public char getChar() {
             return data[row][col];
+        }
+
+        public void setChar(char c) {
+            data[row][col] = c;
         }
 
         @Override
