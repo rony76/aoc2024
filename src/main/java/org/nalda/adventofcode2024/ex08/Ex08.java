@@ -15,6 +15,10 @@ public class Ex08 {
         Ex08 ex08 = new Ex08("ex08.input.txt");
         long count = ex08.countAntinodes();
         System.out.println(count);
+
+        ex08 = new Ex08("ex08.input.txt");
+        count = ex08.countAntinodesWithHarmonics();
+        System.out.println(count);
     }
 
     private final BidimensionalMap map;
@@ -30,6 +34,45 @@ public class Ex08 {
 
         return map.reduce((count, position) -> position.getChar() == '#' ? count + 1 : count, 0L);
     }
+
+    public long countAntinodesWithHarmonics() {
+        Map<Character, List<Position>> positionsByChar = buildPositionsByChar();
+
+        findAntinodesWithHarmonics(positionsByChar);
+
+        return map.reduce((count, position) -> position.getChar() == '#' ? count + 1 : count, 0L);
+    }
+
+    private void findAntinodesWithHarmonics(Map<Character, List<Position>> positionsByChar) {
+        positionsByChar.forEach((c, positions) -> {
+            if (positions.size() == 1) {
+                return;
+            }
+
+            for (int i = 0; i < positions.size() - 1; i++) {
+                final Position p1 = positions.get(i);
+                for (int j = i + 1; j < positions.size(); j++) {
+                    Position p2 = positions.get(j);
+                    final Distance distance = p1.getDistanceFrom(p2);
+
+                    Position antinodeCandidate = p2;
+                    while (antinodeCandidate != null) {
+                        antinodeCandidate.setChar('#');
+                        antinodeCandidate = antinodeCandidate.move(distance);
+                    }
+
+                    antinodeCandidate = p1;
+                    while (antinodeCandidate != null) {
+                        antinodeCandidate.setChar('#');
+                        antinodeCandidate = antinodeCandidate.move(distance.invert());
+                    }
+                }
+            }
+
+        });
+
+    }
+
 
     private void findAntinodes(Map<Character, List<Position>> positionsByChar) {
         positionsByChar.forEach((c, positions) -> {

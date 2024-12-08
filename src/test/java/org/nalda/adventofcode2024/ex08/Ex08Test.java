@@ -12,4 +12,12 @@ public class Ex08Test {
 
         assertThat(count).isEqualTo(14);
     }
+
+    @Test
+    void countAntinodesWithHarmonics() {
+        Ex08 ex08 = new Ex08("ex08.input.txt");
+        long count = ex08.countAntinodesWithHarmonics();
+
+        assertThat(count).isEqualTo(34);
+    }
 }
