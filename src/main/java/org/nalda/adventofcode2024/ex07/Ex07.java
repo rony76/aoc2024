@@ -35,6 +35,7 @@ public class Ex07 {
         return getLineStream(inputName)
                 .filter(line -> !line.isEmpty())
                 .map(Calibration::new)
+                .parallel()
                 .filter(Calibration::canBeMadeTrueWithConcat)
                 .map(Calibration::getTestValue)
                 .reduce(BigInteger.ZERO, BigInteger::add);

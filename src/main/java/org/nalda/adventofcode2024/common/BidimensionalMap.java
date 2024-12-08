@@ -3,6 +3,7 @@ package org.nalda.adventofcode2024.common;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static org.nalda.adventofcode2024Ø.ResourceUtil.getLineList;
@@ -56,6 +57,14 @@ public class BidimensionalMap {
         return result;
     }
 
+    public void forEach(Consumer<Position> consumer) {
+        for (int row = 0; row < height; row++) {
+            for (int col = 0; col < width; col++) {
+                consumer.accept(positionAt(row, col));
+            }
+        }
+    }
+
     public class Position {
 
         protected final int row;
@@ -72,6 +81,18 @@ public class BidimensionalMap {
                 return null;
             }
             final int col = this.col + direction.deltaCol;
+            if (col < 0 || col >= width) {
+                return null;
+            }
+            return positionAt(row, col);
+        }
+
+        public Position move(Distance distance) {
+            final int row = this.row + distance.deltaRow;
+            if (row < 0 || row >= height) {
+                return null;
+            }
+            final int col = this.col + distance.deltaCol;
             if (col < 0 || col >= width) {
                 return null;
             }
@@ -104,9 +125,33 @@ public class BidimensionalMap {
         }
 
 
+        public Distance getDistanceFrom(Position other) {
+            return new Distance(other.row - row, other.col - col);
+        }
     }
 
-    public enum Direction {
+    public class Distance {
+        private final int deltaRow;
+        private final int deltaCol;
+
+        public Distance(int deltaRow, int deltaCol) {
+            this.deltaRow = deltaRow;
+            this.deltaCol = deltaCol;
+        }
+
+        public Distance invert() {
+            return new Distance(-deltaRow, -deltaCol);
+        }
+
+        @Override
+        public String toString() {
+            return "<" + deltaRow +
+                    "," + deltaCol +
+                    '>';
+        }
+    }
+
+    public enum Direction  {
         N(-1, 0),
         NE(-1, 1),
         E(0, 1),
