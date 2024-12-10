@@ -17,7 +17,7 @@ public class Ex01 {
         getLineStream("ex01.input.txt")
                 .filter(line -> !line.isBlank())
                 .forEach(line -> {
-                    final String[] items = line.split("\s+");
+                    final String[] items = line.split("\\s+");
                     list1.add(Integer.parseInt(items[0]));
                     list2.add(Integer.parseInt(items[1]));
                 });
@@ -41,15 +41,15 @@ public class Ex01 {
         getLineStream("ex01.input.txt")
                 .filter(line -> !line.isBlank())
                 .forEach(line -> {
-                    final String[] items = line.split("\s+");
+                    final String[] items = line.split("\\s+");
                     list.add(Integer.parseInt(items[0]));
                     occurrences.compute(Integer.parseInt(items[1]), (k, v) -> v == null ? 1 : v + 1);
                 });
 
         long similarityScore = 0L;
 
-        for (int i = 0; i < list.size(); i++) {
-            similarityScore += (long) list.get(i) * occurrences.getOrDefault(list.get(i), 0);
+        for (Integer i : list) {
+            similarityScore += (long) i * occurrences.getOrDefault(i, 0);
         }
 
         System.out.println(similarityScore);

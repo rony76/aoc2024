@@ -130,7 +130,7 @@ public class BidimensionalMap {
         }
     }
 
-    public class Distance {
+    public static class Distance {
         private final int deltaRow;
         private final int deltaCol;
 

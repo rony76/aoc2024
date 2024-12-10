@@ -33,7 +33,7 @@ public class Ex02 {
         }
 
         public static Report createReport(String input) {
-            int[] levels = Arrays.stream(input.split("\s+")).mapToInt(Integer::parseInt).toArray();
+            int[] levels = Arrays.stream(input.split("\\s+")).mapToInt(Integer::parseInt).toArray();
             if (levels.length < 2) {
                 throw new IllegalArgumentException("Report must have at least 2 levels");
             }

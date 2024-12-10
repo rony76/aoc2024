@@ -1,5 +1,7 @@
 package org.nalda.adventofcode2024.ex07;
 
+import lombok.Getter;
+
 import java.math.BigInteger;
 import java.util.Arrays;
 
@@ -41,8 +43,9 @@ public class Ex07 {
                 .reduce(BigInteger.ZERO, BigInteger::add);
     }
 
-    private class Calibration {
+    private static class Calibration {
 
+        @Getter
         private final BigInteger testValue;
         private final BigInteger[] terms;
 
@@ -83,8 +86,5 @@ public class Ex07 {
                     yieldsTestValueWithConcat(new BigInteger(acc + terms[index].toString()), index + 1);
         }
 
-        public BigInteger getTestValue() {
-            return testValue;
-        }
     }
 }
