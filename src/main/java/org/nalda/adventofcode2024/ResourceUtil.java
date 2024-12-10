@@ -1,4 +1,4 @@
-package org.nalda.adventofcode2024Ø;
+package org.nalda.adventofcode2024;
 
 import lombok.SneakyThrows;
 

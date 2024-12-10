@@ -3,7 +3,7 @@ package org.nalda.adventofcode2024.ex07;
 import java.math.BigInteger;
 import java.util.Arrays;
 
-import static org.nalda.adventofcode2024Ø.ResourceUtil.*;
+import static org.nalda.adventofcode2024.ResourceUtil.*;
 
 public class Ex07 {
 

@@ -6,7 +6,7 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static org.nalda.adventofcode2024Ø.ResourceUtil.getLineList;
+import static org.nalda.adventofcode2024.ResourceUtil.getLineList;
 
 public class BidimensionalMap {
     public final char[][] data;

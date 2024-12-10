@@ -2,7 +2,7 @@ package org.nalda.adventofcode2024.ex05;
 
 import java.util.*;
 
-import static org.nalda.adventofcode2024Ø.ResourceUtil.*;
+import static org.nalda.adventofcode2024.ResourceUtil.*;
 
 public class Ex05 {
 

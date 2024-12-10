@@ -3,7 +3,7 @@ package org.nalda.adventofcode2024.ex01;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import static org.nalda.adventofcode2024Ø.ResourceUtil.getLineStream;
+import static org.nalda.adventofcode2024.ResourceUtil.getLineStream;
 
 public class Ex01 {
     public static void main(String[] args) {

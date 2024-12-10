@@ -2,7 +2,7 @@ package org.nalda.adventofcode2024.ex02;
 
 import java.util.Arrays;
 
-import static org.nalda.adventofcode2024Ø.ResourceUtil.*;
+import static org.nalda.adventofcode2024.ResourceUtil.*;
 
 public class Ex02 {
     public long countSafeReports(String inputName) {

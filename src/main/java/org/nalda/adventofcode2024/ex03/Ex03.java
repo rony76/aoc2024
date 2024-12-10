@@ -4,7 +4,7 @@ import java.math.BigInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.nalda.adventofcode2024Ø.ResourceUtil.*;
+import static org.nalda.adventofcode2024.ResourceUtil.*;
 
 public class Ex03 {
     private boolean enabled = true;
